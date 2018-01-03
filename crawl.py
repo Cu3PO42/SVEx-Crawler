@@ -32,6 +32,7 @@ def retry(times, except_handler):
 
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
+USER_AGENT = 'svex-crawler/0.1 by Cu3PO42'
 
 now = time.mktime(datetime.datetime.utcnow().timetuple())
 half_year_ago = now - 60 * 60 * 24 * 182
@@ -39,6 +40,9 @@ half_year_ago = now - 60 * 60 * 24 * 182
 def get_token():
     r = requests.post(
         'https://www.reddit.com/api/v1/access_token',
+        headers = {
+            'User-Agent': USER_AGENT
+        },
         data = { 'grant_type': 'client_credentials' },
         auth=(CLIENT_ID, CLIENT_SECRET)
     )
@@ -55,7 +59,7 @@ def get_tsvs(token, generation, after):
         'https://oauth.reddit.com/r/SVExchange/search',
         headers = {
             'Authorization': 'bearer ' + token,
-            'User-Agent': 'svex-crawler/0.1 by Cu3PO42'
+            'User-Agent': USER_AGENT
         },
         params = {
             'q': 'flair:"TSV (Gen ' + str(generation) + ')" AND (NOT flair:banned) AND nsfw:no',
