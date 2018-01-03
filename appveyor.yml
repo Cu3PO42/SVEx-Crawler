@@ -1,0 +1,40 @@
+image: Visual Studio 2017
+
+environment:
+  PYTHON: C:\\Python36-x64
+  GH_NAME: Cu3PO42
+  GH_EMAIL: cu3po42@gmail.com
+  GH_TOKEN:
+    secure: JDKPRC/4ie0C7Gq8wnEO345Vzj5sdfRndh7vyqi5pjijvKh8FpTeFl/uxQcTOT9E
+  CLIENT_ID:
+    secure: 8AzfGr59LsOU2Fp3KRVH5Q==
+  CLIENT_SECRET:
+    secure: jhCWuDQ5ggBQH5t7rCC/w0hS/EexMtvthVudix4cyqc=
+
+install:
+  - "%PYTHON%\\python -m pip install -r requirements.txt"
+
+build_script:
+  - "%PYTHON%\\python crawl.py"
+
+deploy_script:
+  - ps: |
+      $remote="https://Cu3PO42:$env:GH_TOKEN@github.com/Cu3PO42/SVEx-Crawler.git"
+      New-Item -name gh-pages -itemType directory
+      Set-Location gh-pages
+      git init
+      git config user.email "$env:GH_EMAIL"
+      git config user.name "$env:GH_NAME"
+      git remote add --fetch origin "$remote"
+      git checkout gh-pages
+      git pull "$remote" gh-pages
+      git rm -rf .
+      Copy-Item "../tsvs.json" -Destination "."
+      git add -A
+      git commit --allow-empty -m "Deploy to GitHub pages ($(Get-Date -Format g))"
+      git push --quiet "$remote" gh-pages
+      Set-Location ..
+      Remove-Item gh-pages -Force -Recurse
+
+artifacts:
+  - path: tsvs.json
