@@ -55,7 +55,7 @@ def handle_request_exception(e):
 
 @retry(3, handle_request_exception)
 @rate_limit(1)
-def get_tsvs(token, generation, lower, upper, after):
+def get_tsvs(token, lower, upper, after):
     r = requests.get(
         'https://oauth.reddit.com/r/SVExchange/search',
         headers = {
@@ -63,7 +63,7 @@ def get_tsvs(token, generation, lower, upper, after):
             'User-Agent': USER_AGENT
         },
         params = {
-            'q': 'flair:"TSV (Gen ' + str(generation) + ')" AND (NOT flair:banned) AND nsfw:no AND (' + ' OR '.join('title:{:04d}'.format(e) for e in range(lower, upper)) + ')',
+            'q': '(NOT flair:banned) AND nsfw:no AND (' + ' OR '.join('title:{:04d}'.format(e) for e in range(lower, upper)) + ')',
             'include_facets': 'false',
             'show': 'all',
             'sort': 'new',
@@ -78,36 +78,39 @@ def get_tsvs(token, generation, lower, upper, after):
     data = r.json()['data']
     return (data['after'], data['children'])
 
-def get_all_tsvs_in_range(token, tsvs, generation, lower, upper):
-    print('Getting all TSVs for generation ' + str(generation) + ' in range {:04d}..{:04d}'.format(lower, upper))
+def get_all_tsvs_in_range(token, tsvs6, tsvs7, lower, upper):
+    print('Getting all TSVs in range {:04d}..{:04d}'.format(lower, upper))
     after = None
     while True:
         print('Requesting all threads before ' + str(after))
-        (after, res) = get_tsvs(token, generation, lower, upper, after)
+        (after, res) = get_tsvs(token, lower, upper, after)
         print('Got ' + str(len(res)) + ' results')
         for e in res:
             e = e['data']
-            tsvs[int(e['title'])].append({ 'user': e['author'], 'link': e['id'] })
             if int(e['created_utc']) <= half_year_ago:
                 break
+            if e['link_flair_text'] == 'TSV (Gen 6)': tsvs6[int(e['title'])].append({ 'user': e['author'], 'link': e['id'] })
+            if e['link_flair_text'] == 'TSV (Gen 7)': tsvs7[int(e['title'])].append({ 'user': e['author'], 'link': e['id'] })
         else:
             if len(res) == 100 and after is not None:
                 continue
         break
 
-def get_all_tsvs(token, generation):
-    tsvs = [[] for i in range(4096)]
+def get_all_tsvs(token):
+    tsvs6 = [[] for i in range(4096)]
+    tsvs7 = [[] for i in range(4096)]
     step = 30
     for start in range(0, 4096, step):
-        get_all_tsvs_in_range(token, tsvs, generation, start, min(start+step, 4096))
-    return tsvs
+        get_all_tsvs_in_range(token, tsvs6, tsvs7, start, min(start+step, 4096))
+    return (tsvs6, tsvs7)
 
 def main():
     token = get_token()
     print('Obtained authorization token')
+    (tsvs6, tsvs7) = get_all_tsvs(token)
     res = { 
-        'tsvs6': get_all_tsvs(token, 6),
-        'tsvs7': get_all_tsvs(token, 7),
+        'tsvs6': tsvs6,
+        'tsvs7': tsvs7,
         'last_updated_at': int(now),
         'version': '1'
     }
