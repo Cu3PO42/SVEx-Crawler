@@ -35,6 +35,3 @@ deploy_script:
       git push --quiet "$remote" gh-pages
       Set-Location ..
       Remove-Item gh-pages -Force -Recurse
-
-artifacts:
-  - path: tsvs.json
