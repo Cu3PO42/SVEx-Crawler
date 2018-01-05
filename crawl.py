@@ -4,6 +4,8 @@ import os
 import time
 import datetime
 import json
+import sys
+import traceback
 
 def rate_limit(rate = 1):
     period = 1 / rate
@@ -149,6 +151,7 @@ def get_all_tsvs(token, porygon_comments):
 def main():
     token = get_token()
     print('Obtained authorization token')
+    print(token)
     porygon_comments = get_all_porygon_comments(token)
     (tsvs6, tsvs7) = get_all_tsvs(token, porygon_comments)
     res = { 
@@ -161,4 +164,7 @@ def main():
         json.dump(res, out)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        traceback.print_exc(file=sys.stderr)
