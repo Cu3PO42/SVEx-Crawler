@@ -2,8 +2,8 @@ image: Visual Studio 2017
 
 environment:
   PYTHON: C:\\Python36-x64
-  GH_NAME: Cu3PO42
-  GH_EMAIL: cu3po42@gmail.com
+  GH_NAME: Cu3PO42 (CI)
+  GH_EMAIL: cu3po42+ci@gmail.com
   GH_TOKEN:
     secure: JDKPRC/4ie0C7Gq8wnEO345Vzj5sdfRndh7vyqi5pjijvKh8FpTeFl/uxQcTOT9E
   CLIENT_ID:
