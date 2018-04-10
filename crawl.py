@@ -122,7 +122,7 @@ def get_all_tsvs_in_range(token, tsvs6, tsvs7, lower, upper, porygon_comments):
         print('Got ' + str(len(res)) + ' results')
         for e in res:
             e = e['data']
-            if not e['link_flair_text'].startswith('TSV (Gen '):
+            if not (e['link_flair_text'] or '').startswith('TSV (Gen '):
                 continue
 
             created = int(e['created_utc'])
