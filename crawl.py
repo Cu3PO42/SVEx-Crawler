@@ -126,15 +126,17 @@ def get_all_tsvs_in_range(token, tsvs6, tsvs7, lower, upper, porygon_comments):
                 continue
 
             created = int(e['created_utc'])
-            tsv = int(e['title'])
-            tsvs = tsvs6 if e['link_flair_text'] == 'TSV (Gen 6)' else tsvs7
+            try:
+                tsv = int(e['title'])
+                tsvs = tsvs6 if e['link_flair_text'] == 'TSV (Gen 6)' else tsvs7
 
-            if created <= half_year_ago - archive_keeper:
-                break
-            if e['over_18'] and (created >= half_year_ago or any(t['user'] == e['author'] for t in tsvs[tsv]) or e['id'] not in porygon_comments):
-                continue
+                if created <= half_year_ago - archive_keeper:
+                    break
+                if e['over_18'] and (created >= half_year_ago or any(t['user'] == e['author'] for t in tsvs[tsv]) or e['id'] not in porygon_comments):
+                    continue
 
-            tsvs[tsv].append({ 'user': e['author'], 'link': e['id'], 'archived': e['over_18'] })
+                tsvs[tsv].append({ 'user': e['author'], 'link': e['id'], 'archived': e['over_18'] })
+            except: pass
         else:
             if len(res) == 100 and after is not None:
                 continue
