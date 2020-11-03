@@ -152,8 +152,8 @@ def get_all_tsvs(token, porygon_comments):
 
 def main():
     token = get_token()
-    print('Obtained authorization token')
-    print(token)
+    #print('Obtained authorization token')
+    #print(token)
     porygon_comments = get_all_porygon_comments(token)
     (tsvs6, tsvs7) = get_all_tsvs(token, porygon_comments)
     res = { 
