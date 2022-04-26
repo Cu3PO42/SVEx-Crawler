@@ -137,12 +137,12 @@ def get_all_tsvs_in_range(token, tsvs6, tsvs7, lower, upper):
                 continue
         break
 
-def get_all_tsvs(token, porygon_comments):
+def get_all_tsvs(token):
     tsvs6 = [[] for i in range(4096)]
     tsvs7 = [[] for i in range(4096)]
     step = 30
     for start in range(0, 4096, step):
-        get_all_tsvs_in_range(token, tsvs6, tsvs7, start, min(start+step, 4096), porygon_comments)
+        get_all_tsvs_in_range(token, tsvs6, tsvs7, start, min(start+step, 4096))
     return (tsvs6, tsvs7)
 
 def main():
