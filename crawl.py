@@ -100,7 +100,7 @@ def get_tsvs(token, lower, upper, after):
             'User-Agent': USER_AGENT
         },
         params = {
-            'q': '(NOT flair:banned) AND (' + ' OR '.join('title:{:04d}'.format(e) for e in range(lower, upper)) + ')',
+            'q': '(NOT flair:banned) AND nsfw:no AND (' + ' OR '.join('title:{:04d}'.format(e) for e in range(lower, upper)) + ')',
             'include_facets': 'false',
             'show': 'all',
             'sort': 'new',
@@ -113,7 +113,7 @@ def get_tsvs(token, lower, upper, after):
     )['data']
     return (data['after'], data['children'])
 
-def get_all_tsvs_in_range(token, tsvs6, tsvs7, lower, upper, porygon_comments):
+def get_all_tsvs_in_range(token, tsvs6, tsvs7, lower, upper):
     print('Getting all TSVs in range {:04d}..{:04d}'.format(lower, upper))
     after = None
     while True:
@@ -130,12 +130,7 @@ def get_all_tsvs_in_range(token, tsvs6, tsvs7, lower, upper, porygon_comments):
                 tsv = int(e['title'])
                 tsvs = tsvs6 if e['link_flair_text'] == 'TSV (Gen 6)' else tsvs7
 
-                if created <= half_year_ago - archive_keeper:
-                    break
-                if e['over_18'] and (created >= half_year_ago or any(t['user'] == e['author'] for t in tsvs[tsv]) or e['id'] not in porygon_comments):
-                    continue
-
-                tsvs[tsv].append({ 'user': e['author'], 'link': e['id'], 'archived': e['over_18'] })
+                tsvs[tsv].append({ 'user': e['author'], 'link': e['id'], 'archived': False })
             except: pass
         else:
             if len(res) == 100 and after is not None:
@@ -154,8 +149,8 @@ def main():
     token = get_token()
     #print('Obtained authorization token')
     #print(token)
-    porygon_comments = get_all_porygon_comments(token)
-    (tsvs6, tsvs7) = get_all_tsvs(token, porygon_comments)
+    #porygon_comments = get_all_porygon_comments(token)
+    (tsvs6, tsvs7) = get_all_tsvs(token)
     res = { 
         'tsvs6': tsvs6,
         'tsvs7': tsvs7,
